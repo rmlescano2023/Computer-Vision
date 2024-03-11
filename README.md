@@ -2,7 +2,7 @@
 
 This is a repository for Computer Vision (CMSC 174) laboratory exercises using OpenCV Python.
 
-### LAB 1
+## LAB 1
 
 In this laboratory exercise, you are given a square image, create a program that replicates the process as shown in this video: https://fb.watch/pWLNqOIQPE/
 
@@ -14,7 +14,7 @@ That is,
 * 3.5 assemble into two images again by taking every other strip to form one image
 * 3.6 merge the two images
 
-### LAB 2
+## LAB 2
 
 The goal of this laboratory exercise is to write an image filtering function and use it to create hybrid images using a simplified version of the SIGGRAPH 2006 paper by Oliva, Torralba, and Schyns. Hybrid images are static images that change in interpretation as a function of the viewing distance. The basic idea is that high frequency tends to dominate perception when it is available, but, at a distance, only the low frequency (smooth) part of the signal can be seen. By blending the high frequency portion of one image with the low-frequency portion of another, you get a hybrid image that leads to different interpretations at different distances.
 
@@ -22,7 +22,7 @@ You will use your own solution to create your own hybrid images.
 
 The provided file hybrid.py contains functions that you need to implement.
 
-**Implementation Details**
+### Implementation Details 
 
 This laboratory exercise is intended to familiarize you with Python, NumPy and image filtering. Once you have created an image filtering function, it is relatively straightforward to construct hybrid images.
 
