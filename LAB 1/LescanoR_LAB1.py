@@ -4,9 +4,9 @@
     Date Modified: 03/11/2024
 
     Description:        
-        This Python program processes an input image by dividing it into horizontal and vertical strips, alternately 
+        This Python script processes an input image by dividing it into horizontal and vertical strips, alternately 
         assembling and merging these strips to create two images, and finally displaying and saving the resulting merged 
-        vertical image.
+        vertical images
 """
 
 import matplotlib.pyplot as plt

@@ -1,8 +1,22 @@
+""" 
+    File: Computer Vision Laboratory 02
+    Author: Renmar M. Lescano
+    Date Modified: 03/11/2024
+
+    Description:        
+        This Python script utilizes the cv2 package to implement an image filtering function. It applies this function to create
+        hybrid images, a concept inspired by the SIGGRAPH 2006 paper authored by Oliva, Torralba, and Schyns. Hybrid images are
+        static images whose interpretation varies with viewing distance. The principle behind them lies in how high-frequency
+        details dominate perception up close, while only low-frequency features are discernible from afar. By blending the
+        high-frequency components of one image with the low-frequency elements of another, hybrid images induce different 
+        interpretations at different viewing distances.
+"""
+
 import sys
 import cv2
 import numpy as np
 
-# --------------------------------------------------------------------------------------------------------------- CROSS-CORRELATION
+# ----------------------------------------------------------------------------------------------------------------------------- CROSS-CORRELATION
 def cross_correlation(image, kernel):
 
     print('Processing cross-correlation...')
@@ -46,7 +60,7 @@ def cross_correlation(image, kernel):
     return image_result
 
 
-# --------------------------------------------------------------------------------------------------------------- CONVOLUTION
+# ----------------------------------------------------------------------------------------------------------------------------- CONVOLUTION
 def convolution(img, kernel):               # Convolution will use Cross-Correlation
 
     print('Processing convolution...')
@@ -59,7 +73,7 @@ def convolution(img, kernel):               # Convolution will use Cross-Correla
     return image_result
     
 
-# --------------------------------------------------------------------------------------------------------------- GAUSSIAN BLUR
+# ----------------------------------------------------------------------------------------------------------------------------- GAUSSIAN BLUR
 def gaussian_blur(sigma, height, width):    # Implement Gaussian Blur to return a kernel, then pass to Convolution along with an image
     
     print('Generating gaussian kernel...')
@@ -83,7 +97,7 @@ def gaussian_blur(sigma, height, width):    # Implement Gaussian Blur to return 
     return kernel
 
 
-# --------------------------------------------------------------------------------------------------------------- LOW PASS
+# ----------------------------------------------------------------------------------------------------------------------------- LOW PASS
 def low_pass(img, sigma, size):             # using Gaussian blurring, implement High Pass and Low Pass filters
     
     print('Generating low pass image...')
@@ -108,7 +122,7 @@ def high_pass(img, sigma, size):            # Original image - Low pass image
     return img - low_pass_image
 
 
-# --------------------------------------------------------------------------------------------------------------- HYBRID IMAGE
+# ----------------------------------------------------------------------------------------------------------------------------- HYBRID IMAGE
 def create_hybrid_image(img1, img2, sigma1, size1, high_low1, sigma2, size2,
         high_low2, mixin_ratio, scale_factor):
     '''This function adds two images to create a hybrid image, based on
@@ -142,7 +156,7 @@ def create_hybrid_image(img1, img2, sigma1, size1, high_low1, sigma2, size2,
     return (hybrid_img * 255).clip(0, 255).astype(np.uint8)
 
 
-# --------------------------------------------------------------------------------------------------------------- OTHER FUNCTIONS
+# ----------------------------------------------------------------------------------------------------------------------------- HELPER FUNCTIONS
 def save_image(title, image):
     cv2.imwrite(title, image)
 
@@ -170,7 +184,7 @@ def save_parameters(sigma1, size1, high_low1, sigma2, size2, high_low2, mixin_ra
         f.write(f"{frequencies}\n")
 
 
-# --------------------------------------------------------------------------------------------------------------- TESTING
+# ----------------------------------------------------------------------------------------------------------------------------- TESTING
 def test_runs(image_1, image_2, mean_filter_kernel):
 
     # Test Cross-Correlation
@@ -195,7 +209,7 @@ def test_runs(image_1, image_2, mean_filter_kernel):
     save_image('5_high_pass_result.png', image_result_5)
 
 
-# --------------------------------------------------------------------------------------------------------------- MAIN
+# ----------------------------------------------------------------------------------------------------------------------------- MAIN
 def main():
 
     # Load the images
