@@ -1,4 +1,4 @@
-*** INSTRUCTIONS ***
+## INSTRUCTIONS
 
 Given a square image, create a program that replicates the process as shown in this video: https://fb.watch/pWLNqOIQPE/
 
