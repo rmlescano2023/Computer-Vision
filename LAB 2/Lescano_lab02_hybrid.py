@@ -146,7 +146,6 @@ def create_hybrid_image(img1, img2, sigma1, size1, high_low1, sigma2, size2,
 def save_image(title, image):
     cv2.imwrite(title, image)
 
-
 def preview_image(title, image):
     cv2.imshow(title, image)
     cv2.waitKey(0)
@@ -159,7 +158,7 @@ def save_parameters(sigma1, size1, high_low1, sigma2, size2, high_low2, mixin_ra
     else:
         frequencies = "Image 1's higher frequencies are used."
 
-    with open('Lescano_lab02_README.txt', 'w') as f:
+    with open('parameters.txt', 'w') as f:
         f.write("PARAMETERS:\n")
         f.write(f"Sigma1: {sigma1}\n")
         f.write(f"Size1: {size1}\n")
@@ -200,12 +199,12 @@ def test_runs(image_1, image_2, mean_filter_kernel):
 def main():
 
     # Load the images
-    image_1 = cv2.imread('Lescano_lab02_left.png')
-    image_2 = cv2.imread('Lescano_lab02_right.png')
+    image_1 = cv2.imread('sample-images/Lescano_lab02_left.png')
+    image_2 = cv2.imread('sample-images/Lescano_lab02_right.png')
 
     # Preview of the images
-    preview_image('Smiling', image_1)           # height = 853px, width = 853px
-    preview_image('Crying', image_2)
+    preview_image('Cow', image_1)           # height = 853px, width = 853px
+    preview_image('Sheep', image_2)
 
     # Mean Filter Kernel
     mean_filter_kernel = np.array([(1,1,1),(1,1,1),(1,1,1)])*(1/9)
@@ -219,7 +218,7 @@ def main():
     high_low1 = 'high'          # High pass
 
     sigma2 = 10
-    size2 = 30
+    size2 = 10
     high_low2 = 'low'           # Low Pass
 
     mixin_ratio = 0.5           # Proportion of each input image that contributes to the final hybrid image
@@ -230,7 +229,7 @@ def main():
 
     # Generate hybrid image
     hybrid_image = create_hybrid_image(image_1, image_2, sigma1, size1, high_low1, sigma2, size2, high_low2, mixin_ratio, scale_factor)
-    save_image('Hybrid_Image.png', hybrid_image)
+    save_image('output/Lescano_lab02_hybrid.png', hybrid_image)
 
     preview_image('Hybrid Image', hybrid_image)
 
