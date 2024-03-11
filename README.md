@@ -12,7 +12,9 @@ That is,
 * 3.3 merge the two images
 * 3.4 divide the merged image vertically into equally-spaced strips
 * 3.5 assemble into two images again by taking every other strip to form one image
-* 3.6 merge the two images
+* 3.6 merge the two 
+
+<br>
 
 ## LAB 2
 
@@ -58,6 +60,8 @@ For just this laboratory exercise, you are forbidden from using any Numpy, Scipy
 
 Your pair of images needs to be aligned using an image manipulation software, e.g., Photoshop, Gimp. 
 Alignments can map the eyes to eyes and nose to nose, edges to edges, etc. It is encouraged to create additional examples (e.g. change of expression, morph between different objects, change over time, etc.). See the hybrid images project page (http://olivalab.mit.edu/hybrid_gallery/gallery.html) for some inspiration. The project page also contains materials from their Siggraph presentation.
+
+<br>
 
 ## LAB 3
 
