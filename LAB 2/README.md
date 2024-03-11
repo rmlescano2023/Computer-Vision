@@ -40,9 +40,9 @@ Alignments can map the eyes to eyes and nose to nose, edges to edges, etc. It is
 
 
 ### Submission
-LastName_lab02_hybrid.py: Submit with all five functions implemented
-LastName_lab02_left.png,LastName_lab02_right.png: Submit the left and right images you used to create hybrid image.
-LastName_lab02_hybrid.png: Submit the hybrid image produced by using your implementation on left and right images
-LastName_lab02_README.txt Must contain high pass and low pass filter parameters(kernel size and kernel sigma) and mix-in ratio.
-	It should also contain which image's higher/lower frequencies are used.
-	Optionally you can add comments on something interesting or different you did in the project.
+- LastName_lab02_hybrid.py: Submit with all five functions implemented
+- LastName_lab02_left.png,LastName_lab02_right.png: Submit the left and right images you used to create hybrid image.
+- LastName_lab02_hybrid.png: Submit the hybrid image produced by using your implementation on left and right images
+- LastName_lab02_README.txt Must contain high pass and low pass filter parameters(kernel size and kernel sigma) and mix-in ratio.
+--- It should also contain which image's higher/lower frequencies are used.
+--- Optionally you can add comments on something interesting or different you did in the project.
