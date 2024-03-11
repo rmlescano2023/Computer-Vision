@@ -1,3 +1,14 @@
+""" 
+    File: Computer Vision Laboratory 01
+    Author: Renmar M. Lescano
+    Date Modified: 03/11/2024
+
+    Description:        
+        This Python program processes an input image by dividing it into horizontal and vertical strips, alternately 
+        assembling and merging these strips to create two images, and finally displaying and saving the resulting merged 
+        vertical image.
+"""
+
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import numpy as np
