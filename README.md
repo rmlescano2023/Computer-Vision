@@ -2,6 +2,8 @@
 
 This is a repository for Computer Vision (CMSC 174) laboratory exercises using OpenCV Python.
 
+<br>
+
 ## LAB 1
 
 In this laboratory exercise, you are given a square image. Then, create a program that replicates the process as shown in this video: https://fb.watch/pWLNqOIQPE/
