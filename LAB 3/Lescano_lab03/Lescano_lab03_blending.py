@@ -4,8 +4,8 @@ import cv2
 import numpy as np
 
 # --------------------------------------------------------------------------------------------------------------- GLOBAL VARIABLES
-PYRAMID_LEVELS = 5                  # Number of levels in the Gaussian and Laplacian pyramids
-GAUSSIAN_KERNEL_SIZE = 5            # Size of the Gaussian kernel
+PYRAMID_LEVELS = 6                  # Number of levels in the Gaussian and Laplacian pyramids
+GAUSSIAN_KERNEL_SIZE = 7            # Size of the Gaussian kernel
 
 
 # --------------------------------------------------------------------------------------------------------------- GAUSSIAN PYRAMID
@@ -116,8 +116,20 @@ def preview_images(image_1, image_2):
 
 def visualize_pyramid(pyramid, pyramid_type):
 
+    # value = pyramid[0].shape[1]     # width of image
+    image_x_position = 30
+    image_y_position = 30
+
     for i, level in enumerate(pyramid):
-        cv2.imshow('Level {} of {}'.format(i, pyramid_type), level)
+
+        value = pyramid[i].shape[1]     # width of image
+
+        cv2.namedWindow('Level {} of {}'.format(i, pyramid_type))
+        cv2.moveWindow('Level {} of {}'.format(i, pyramid_type), image_x_position, image_y_position)
+        cv2.imshow('Level {} of {}'.format(i, pyramid_type), pyramid[i])
+
+        image_x_position += value
+
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
@@ -140,7 +152,7 @@ def show_blended_image(blended_image):
 
 
 # --------------------------------------------------------------------------------------------------------------- MAIN
-def main():
+def blend_apple_orange(levels, kernel_size):
 
     # Load the images
     image_1 = cv2.imread('examples/Lescano_lab03_left.png')
@@ -148,10 +160,6 @@ def main():
 
     # Image preview
     preview_images(image_1, image_2)
-
-    # Define parameters
-    levels = PYRAMID_LEVELS
-    kernel_size = GAUSSIAN_KERNEL_SIZE
 
     # Generate Gaussian pyramid of the two images
     img1_gaussian_pyramid = generate_gaussian_pyramid(image_1, levels, kernel_size)         # apple
@@ -171,6 +179,50 @@ def main():
     blended_image = blend_images(concat_result, levels)
     cv2.imwrite('output/Lescano_lab03_blendvert.png', blended_image)
     show_blended_image(blended_image)
+
+def blend_crazy(levels, kernel_size):
+
+    # Load the images
+    image_1 = cv2.imread('examples/Lescano_lab03_crazyone.png')
+    image_2 = cv2.imread('examples/Lescano_lab03_crazytwo.png')
+
+    # Create the mask
+    mask = np.zeros((1000,1800,3), dtype='float32')
+    mask[250:500,640:1440,:] = (1,1,1)
+
+    # Generate Gaussian pyramid of all the images
+    img1_gaussian_pyramid = generate_gaussian_pyramid(image_1, levels, kernel_size)
+    img2_gaussian_pyramid = generate_gaussian_pyramid(image_2, levels, kernel_size)
+    mask_gaussian_pyramid = generate_gaussian_pyramid(mask, levels, kernel_size)
+
+    # Try using my program
+    gaussian_pyr_1 = generate_gaussian_pyramid(image_1, levels, kernel_size)
+    laplacian_pyr_1 = generate_laplacian_pyramid(gaussian_pyr_1, levels)
+
+    # Visualize
+    # visualize_pyramid(gaussian_pyr_1, 'Gaussian One')
+    # visualize_pyramid(laplacian_pyr_1, 'Laplacian One')
+
+    # Try using my program
+    gaussian_pyr_2 = generate_gaussian_pyramid(image_2, levels, kernel_size)
+    laplacian_pyr_2 = generate_laplacian_pyramid(gaussian_pyr_2, levels)
+
+    # Visualize
+    visualize_pyramid(gaussian_pyr_2, 'Gaussian Two')
+    visualize_pyramid(laplacian_pyr_2, 'Laplacian Two')
+
+
+def main():
+
+    # Define parameters
+    levels = PYRAMID_LEVELS
+    kernel_size = GAUSSIAN_KERNEL_SIZE
+
+    # Vertical blend
+    # blend_apple_orange(levels, kernel_size)
+
+    # Blend two images using an irregular mask
+    blend_crazy(levels, kernel_size)
 
 if __name__ == "__main__":
     main()
