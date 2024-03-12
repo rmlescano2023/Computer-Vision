@@ -132,10 +132,10 @@ def main():
     img2_laplacian_pyramid = generate_laplacian_pyramid(img2_gaussian_pyramid, levels)    # orange
 
     # Visualize Gaussian & Laplacian pyramids
-    # visualize_pyramid(img1_gaussian_pyramid, pyramid_type="Gaussian")
-    # visualize_pyramid(img2_gaussian_pyramid, pyramid_type="Gaussian")
-    # visualize_pyramid(img1_laplacian_pyramid, pyramid_type="Laplacian")
-    # visualize_pyramid(img2_laplacian_pyramid, pyramid_type="Laplacian")
+    visualize_pyramid(img1_gaussian_pyramid, pyramid_type="Gaussian")
+    visualize_pyramid(img2_gaussian_pyramid, pyramid_type="Gaussian")
+    visualize_pyramid(img1_laplacian_pyramid, pyramid_type="Laplacian")
+    visualize_pyramid(img2_laplacian_pyramid, pyramid_type="Laplacian")
 
     # Concatenating the half images
     concat_result = concat_images(img1_laplacian_pyramid, img2_laplacian_pyramid)
