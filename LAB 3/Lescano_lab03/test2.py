@@ -53,31 +53,39 @@ def reconstruct(laplacian_pyr):
 if __name__ == '__main__':
     # Step-1
     # Load the two images
-    img1 = cv2.imread('examples/sky.png')
+    img1 = cv2.imread('examples/Lescano_lab03_crazyone.png')
     img1 = cv2.resize(img1, (1800, 1000))
-    img2 = cv2.imread('examples/plane.jpg')
+    img2 = cv2.imread('examples/Lescano_lab03_crazytwo.png')
     img2 = cv2.resize(img2, (1800, 1000))
+    mask = cv2.imread('examples/mask.png')
+    mask = cv2.resize(mask, (1800, 1000))
 
-    # Create the mask
-    mask = np.zeros((1000,1800,3), dtype='float32')
-    mask[250:500,640:1440,:] = (1,1,1)
-    
+    """ cv2.imshow('Left', img1)
+    cv2.imshow('Right', img2)
+    cv2.imshow('Mask', mask)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows() """
+
     num_levels = 7
     
-
-
     # For image-1, calculate Gaussian and Laplacian
-    # gaussian_pyr_1 = gaussian_pyramid(img1, num_levels)
-    # laplacian_pyr_1 = laplacian_pyramid(gaussian_pyr_1)
+    """ gaussian_pyr_1 = gaussian_pyramid(img1, num_levels)
+    laplacian_pyr_1 = laplacian_pyramid(gaussian_pyr_1) """
 
     # Try using my program
     gaussian_pyr_1 = generate_gaussian_pyramid(img1, num_levels, GAUSSIAN_KERNEL_SIZE)
     laplacian_pyr_1 = generate_laplacian_pyramid(gaussian_pyr_1, num_levels)
 
-
-
-
+    """ for i, level in enumerate(gaussian_pyr_1):
+        cv2.imshow(f'Gaussian level {i}', level)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
     
+    for i, level in enumerate(laplacian_pyr_1):
+        cv2.imshow(f'Laplacian level {i}', level)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows() """
+
     # For image-2, calculate Gaussian and Laplacian
     # gaussian_pyr_2 = gaussian_pyramid(img2, num_levels)
     # laplacian_pyr_2 = laplacian_pyramid(gaussian_pyr_2)
@@ -86,13 +94,25 @@ if __name__ == '__main__':
     gaussian_pyr_2 = generate_gaussian_pyramid(img2, num_levels, GAUSSIAN_KERNEL_SIZE)
     laplacian_pyr_2 = generate_laplacian_pyramid(gaussian_pyr_2, num_levels)
 
-
-
-
+    """ for i, level in enumerate(gaussian_pyr_2):
+        cv2.imshow(f'Gaussian level {i}', level)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+    
+    for i, level in enumerate(laplacian_pyr_2):
+        cv2.imshow(f'Laplacian level {i}', level)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows() """
 
     # Calculate the Gaussian pyramid for the mask image and reverse it.
     mask_pyr_final = gaussian_pyramid(mask, num_levels)
     mask_pyr_final.reverse()
+
+    """ for i, level in enumerate(mask_pyr_final):
+        cv2.imshow(f'Gaussian level {i}', level)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows() """
+    
 
     # Blend the images
     add_laplace = blend(laplacian_pyr_1,laplacian_pyr_2,mask_pyr_final)
