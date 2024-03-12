@@ -1,156 +1,85 @@
 import cv2
 import numpy as np
 
-# --------------------------------------------------------------------------------------------------------------- GLOBAL VARIABLES
-STACK_LEVELS = 5                # Number of levels in the Gaussian and Laplacian stacks
-GAUSSIAN_KERNEL_SIZE = 7        # Size of the Gaussian kernel
 
+# Step-2
+# Find the Gaussian pyramid of the two images and the mask
+def gaussian_pyramid(img, num_levels):
+    lower = img.copy()
+    gaussian_pyr = [lower]
+    for i in range(num_levels):
+        lower = cv2.pyrDown(lower)
+        gaussian_pyr.append(np.float32(lower))
+    return gaussian_pyr
 
-# --------------------------------------------------------------------------------------------------------------- GAUSSIAN STACK
-def generate_gaussian_stack(image, levels, kernel_size):
-
-    image_stack = [image]       # Original image is at index 0
-
-    for i in range(levels):
-        blurred_image = gaussian_blur(image_stack[-1], kernel_size)
-        image_stack.append(blurred_image)
-
-    return image_stack
-
-    # Order:
-    # Level 0 = Original Image
-    # Level 5 = Blurriest Gaussian
-    # image_stack = [L0, L1, L2, L3, L4, L5]    => 5 levels, 6 images
-
-
-# --------------------------------------------------------------------------------------------------------------- LAPLACIAN STACK
-def generate_laplacian_stack(stack, levels):    # Levels = 5
-
-    image_stack = []   
-
-    for i in range(levels):
-        img_1 = stack[i]
-        img_2 = stack[i + 1]
-        up_sample_image = img_1 - img_2
-        image_stack.append(up_sample_image)
-
-    image_stack.append(stack[levels - 1])
-
-    return image_stack
-
-    # L0 = L0 - L1
-    # L1 = L1 - L2
-    # L2 = L2 - L3
-    # L3 = L3 - L4
-    # L4 = L4 - L5
-    # L5 = L5
-
-
-# --------------------------------------------------------------------------------------------------------------- BLENDING
-def concat_images(stack_1, stack_2):       # stack_1 is apple, stack_2 is orange
-
-    concatenated_images = []
-
-    # left_img is from stack_1, right_img is from stack_2
-    for left_img, right_img in zip(stack_1, stack_2):
-        columns = left_img.shape[1]
-
-        result = np.hstack((left_img[ : , 0 : columns//2], right_img[ : , columns//2 : ]))
-
-        concatenated_images.append(result)
+# Step-3
+# Then calculate the Laplacian pyramid
+def laplacian_pyramid(gaussian_pyr):
+    laplacian_top = gaussian_pyr[-1]
+    num_levels = len(gaussian_pyr) - 1
     
-    return concatenated_images
+    laplacian_pyr = [laplacian_top]
+    for i in range(num_levels,0,-1):
+        size = (gaussian_pyr[i - 1].shape[1], gaussian_pyr[i - 1].shape[0])
+        gaussian_expanded = cv2.pyrUp(gaussian_pyr[i], dstsize=size)
+        laplacian = np.subtract(gaussian_pyr[i-1], gaussian_expanded)
+        laplacian_pyr.append(laplacian)
+    return laplacian_pyr
 
+# Step-4
+# Now blend the two images wrt. the mask
+def blend(laplacian_A,laplacian_B,mask_pyr):
+    LS = []
+    for la,lb,mask in zip(laplacian_A,laplacian_B,mask_pyr):
+        ls = lb * mask + la * (1.0 - mask)
+        LS.append(ls)
+    return LS
 
-# --------------------------------------------------------------------------------------------------------------- HELPER FUNCTIONS
-def gaussian_blur(image, kernel_size):
+# Step-5
+# Reconstruct the original image
+def reconstruct(laplacian_pyr):
+    laplacian_top = laplacian_pyr[0]
+    laplacian_lst = [laplacian_top]
+    num_levels = len(laplacian_pyr) - 1
+    for i in range(num_levels):
+        size = (laplacian_pyr[i + 1].shape[1], laplacian_pyr[i + 1].shape[0])
+        laplacian_expanded = cv2.pyrUp(laplacian_top, dstsize=size)
+        laplacian_top = cv2.add(laplacian_pyr[i+1], laplacian_expanded)
+        laplacian_lst.append(laplacian_top)
+    return laplacian_lst
 
-    return cv2.GaussianBlur(image, (kernel_size, kernel_size), 0)
+# Now let's call all these functions
+if __name__ == '__main__':
+    # Step-1
+    # Load the two images
+    img1 = cv2.imread('examples/sky.png')
+    img1 = cv2.resize(img1, (1800, 1000))
+    img2 = cv2.imread('examples/plane.jpg')
+    img2 = cv2.resize(img2, (1800, 1000))
 
-def preview_images(image_1, image_2):
-
-    value = image_1.shape[1]
-    image_1_x_position = 30
-    image_1_y_position = 30
-    image_2_x_position = image_1_x_position + value
-    image_2_y_position = image_1_y_position
-
-    cv2.namedWindow('Image 1')
-    cv2.moveWindow('Image 1', image_1_x_position, image_1_y_position)
-    cv2.imshow('Image 1', image_1)
-
-    cv2.namedWindow('Image 2')
-    cv2.moveWindow('Image 2', image_2_x_position, image_2_y_position)
-    cv2.imshow('Image 2', image_2)
-
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-def visualize_stack(stack):
-
-    for i, level in enumerate(stack):
-        cv2.imshow(f'Level {i}', level)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-
-
-# --------------------------------------------------------------------------------------------------------------- MAIN
-def main():
-
-    # Load the images
-    image_1 = cv2.imread('examples/apple.jpg')
-    image_2 = cv2.imread('examples/orange.jpg')
-
-    # Image preview
-    preview_images(image_1, image_2)
-
-    # Define parameters
-    levels = STACK_LEVELS
-    kernel_size = GAUSSIAN_KERNEL_SIZE
-
-    # Generate Gaussian stacks of the two images
-    img1_gaussian_stack = generate_gaussian_stack(image_1, levels, kernel_size)     # apple
-    img2_gaussian_stack = generate_gaussian_stack(image_2, levels, kernel_size)     # orange
-
-    # Generate Laplacian stacks of the two images
-    img1_laplacian_stack = generate_laplacian_stack(img1_gaussian_stack, levels)    # apple
-    img2_laplacian_stack = generate_laplacian_stack(img2_gaussian_stack, levels)    # orange
-
-    # Visualize Gaussian & Laplacian stacks
-    # visualize_stack(img1_gaussian_stack)
-    # visualize_stack(img2_gaussian_stack)
-    # visualize_stack(img1_laplacian_stack)
-    # visualize_stack(img2_laplacian_stack)
-
-    # Concatenating the half images
-    concat_result = concat_images(img1_laplacian_stack, img2_laplacian_stack)
-    visualize_stack(concat_result)
-
-    # Blending
-    """ blend_with_invisible_edge = concat_result[0]
-    for i in range(1, levels):
-        # blend_with_invisible_edge = cv2.pyrUp(blend_with_invisible_edge)
-        blend_with_invisible_edge = cv2.add(blend_with_invisible_edge, concat_result[i])
-
-    cv2.namedWindow("Pyramid_blending")
-    cv2.moveWindow("Pyramid_blending", 30, 30)
-    cv2.imshow("Pyramid_blending", blend_with_invisible_edge)      
-
-    cv2.waitKey(0)
-    cv2.destroyAllWindows() """
-
-
-if __name__ == "__main__":
-    main()
-
-
-# STEPS:
+    # Create the mask
+    mask = np.zeros((1000,1800,3), dtype='float32')
+    mask[250:500,640:1440,:] = (1,1,1)
     
-# In Gaussian Pyramid, blur only the image (don't subsample).
-    # You typically use the Gaussian filter.
-
-# Laplacian stack needs to be modified.
+    num_levels = 7
     
-# Generate Gaussian stack of the images first, because that will be used as parameters for
-    # generating the Laplacian stacks. At the end, when blending the two images, only the
-    # Laplacian stack will be utilized.
+    # For image-1, calculate Gaussian and Laplacian
+    gaussian_pyr_1 = gaussian_pyramid(img1, num_levels)
+    laplacian_pyr_1 = laplacian_pyramid(gaussian_pyr_1)
+
+    # For image-2, calculate Gaussian and Laplacian
+    gaussian_pyr_2 = gaussian_pyramid(img2, num_levels)
+    laplacian_pyr_2 = laplacian_pyramid(gaussian_pyr_2)
+
+    # Calculate the Gaussian pyramid for the mask image and reverse it.
+    mask_pyr_final = gaussian_pyramid(mask, num_levels)
+    mask_pyr_final.reverse()
+
+    # Blend the images
+    add_laplace = blend(laplacian_pyr_1,laplacian_pyr_2,mask_pyr_final)
+
+    # Reconstruct the images
+    final  = reconstruct(add_laplace)
+
+    # Save the final image to the disk
+    cv2.imwrite('output/crazyblend.png', final[num_levels])

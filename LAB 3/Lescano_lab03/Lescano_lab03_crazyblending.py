@@ -5,28 +5,18 @@ from Lescano_lab03_blending import *
 def main():
 
     # Load the images
-    image_1 = cv2.imread('examples/Lescano_lab03_crazyone.png')
-    image_2 = cv2.imread('examples/Lescano_lab03_crazytwo.png')
-    mask_image = cv2.imread('examples/mask.png')
+    image_1 = cv2.imread('examples/Lescano_lab03_crazyone.png')     # (600, 960, 3)
+    image_2 = cv2.imread('examples/Lescano_lab03_crazytwo.png')     # (600, 960, 3)
+    mask_image = cv2.imread('examples/mask.png')                    # (600, 960, 3)
 
     # Convert the image to grayscale
-    gray_image_1 = cv2.cvtColor(image_1, cv2.COLOR_BGR2GRAY)
-    gray_image_2 = cv2.cvtColor(image_2, cv2.COLOR_BGR2GRAY)
-    gray_mask = cv2.cvtColor(mask_image, cv2.COLOR_BGR2GRAY)
+    gray_image_1 = cv2.cvtColor(image_1, cv2.COLOR_BGR2GRAY)        # (600, 960)
+    gray_image_2 = cv2.cvtColor(image_2, cv2.COLOR_BGR2GRAY)        # (600, 960)
+    gray_mask = cv2.cvtColor(mask_image, cv2.COLOR_BGR2GRAY)        # (600, 960)
 
     # Image preview
     preview_images(gray_image_1, gray_image_2)
     cv2.imshow("Mask", mask_image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows
-
-    # Testing
-    img1_copy = image_1.copy()
-    img2_copy = image_2.copy()
-    mask_copy = mask_image.copy()
-
-    img2_minus_mask = cv2.subtract(mask_copy, img2_copy)
-    cv2.imshow("Test", img2_minus_mask)
     cv2.waitKey(0)
     cv2.destroyAllWindows
 

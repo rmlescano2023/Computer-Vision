@@ -66,6 +66,7 @@ def blend_images(concat_result, levels):
 
     return blended_image
 
+
 # --------------------------------------------------------------------------------------------------------------- HELPER FUNCTIONS
 def gaussian_blur(image, kernel_size):
 
@@ -97,13 +98,19 @@ def visualize_pyramid(pyramid, pyramid_type):
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
+def test_visualizations(img1_gaussian_pyramid, img2_gaussian_pyramid, img1_laplacian_pyramid, img2_laplacian_pyramid, concat_result):
+    
+    visualize_pyramid(img1_gaussian_pyramid, pyramid_type="Gaussian")
+    visualize_pyramid(img2_gaussian_pyramid, pyramid_type="Gaussian")
+    visualize_pyramid(img1_laplacian_pyramid, pyramid_type="Laplacian")
+    visualize_pyramid(img2_laplacian_pyramid, pyramid_type="Laplacian")
+    visualize_pyramid(concat_result, pyramid_type="Concatenated")
+
 def show_blended_image(blended_image):
 
     cv2.namedWindow("Pyramid_blending")
     cv2.moveWindow("Pyramid_blending", 30, 30)
     cv2.imshow("Pyramid_blending", blended_image)
-
-    cv2.imwrite('Lescano_lab03_blendvert.png', blended_image)
 
     cv2.waitKey(0)
     cv2.destroyAllWindows()
@@ -131,20 +138,16 @@ def main():
     img1_laplacian_pyramid = generate_laplacian_pyramid(img1_gaussian_pyramid, levels)    # apple
     img2_laplacian_pyramid = generate_laplacian_pyramid(img2_gaussian_pyramid, levels)    # orange
 
-    # Visualize Gaussian & Laplacian pyramids
-    visualize_pyramid(img1_gaussian_pyramid, pyramid_type="Gaussian")
-    visualize_pyramid(img2_gaussian_pyramid, pyramid_type="Gaussian")
-    visualize_pyramid(img1_laplacian_pyramid, pyramid_type="Laplacian")
-    visualize_pyramid(img2_laplacian_pyramid, pyramid_type="Laplacian")
-
     # Concatenating the half images
     concat_result = concat_images(img1_laplacian_pyramid, img2_laplacian_pyramid)
-    visualize_pyramid(concat_result, pyramid_type="Concatenated")
 
+    # Visualizations
+    # test_visualizations(img1_gaussian_pyramid, img2_gaussian_pyramid, img1_laplacian_pyramid, img2_laplacian_pyramid, concat_result)
+    
     # Blending
     blended_image = blend_images(concat_result, levels)
+    cv2.imwrite('output/Lescano_lab03_blendvert.png', blended_image)
     show_blended_image(blended_image)
-
 
 if __name__ == "__main__":
     main()
