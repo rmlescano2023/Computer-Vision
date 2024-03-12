@@ -90,10 +90,10 @@ def preview_images(image_1, image_2):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-def visualize_pyramid(pyramid):
+def visualize_pyramid(pyramid, pyramid_type):
 
     for i, level in enumerate(pyramid):
-        cv2.imshow(f'Level {i}', level)
+        cv2.imshow('Level {} of {}'.format(i, pyramid_type), level)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
 
@@ -132,14 +132,14 @@ def main():
     img2_laplacian_pyramid = generate_laplacian_pyramid(img2_gaussian_pyramid, levels)    # orange
 
     # Visualize Gaussian & Laplacian pyramids
-    # visualize_pyramid(img1_gaussian_pyramid)
-    # visualize_pyramid(img2_gaussian_pyramid)
-    # visualize_pyramid(img1_laplacian_pyramid)
-    # visualize_pyramid(img2_laplacian_pyramid)
+    # visualize_pyramid(img1_gaussian_pyramid, pyramid_type="Gaussian")
+    # visualize_pyramid(img2_gaussian_pyramid, pyramid_type="Gaussian")
+    # visualize_pyramid(img1_laplacian_pyramid, pyramid_type="Laplacian")
+    # visualize_pyramid(img2_laplacian_pyramid, pyramid_type="Laplacian")
 
     # Concatenating the half images
     concat_result = concat_images(img1_laplacian_pyramid, img2_laplacian_pyramid)
-    # visualize_pyramid(concat_result)
+    visualize_pyramid(concat_result, pyramid_type="Concatenated")
 
     # Blending
     blended_image = blend_images(concat_result, levels)
