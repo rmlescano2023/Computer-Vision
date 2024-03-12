@@ -14,19 +14,22 @@ def generate_gaussian_pyramid(image, levels, kernel_size):
     image_pyramid = [image]       # Original image is at index 0
 
     for i in range(levels):
-        blurred_image = gaussian_blur(image_pyramid[-1], kernel_size)
+        blurred_image = gaussian_blur(image_pyramid[-1], kernel_size)   # blurs the last image in every iteration in the list
         blurred_image = cv2.resize(blurred_image, (blurred_image.shape[1] // 2, blurred_image.shape[0] // 2))
         image_pyramid.append(blurred_image)
 
     return image_pyramid
 
+# Visualization:
+# Iteration 1 = blurs original image, resizes to half, saved as L1 at index 2
+# Iteration 2 = blurs L1, resizes to half, saved as L2 at index 3
 
 # --------------------------------------------------------------------------------------------------------------- LAPLACIAN PYRAMID
 def generate_laplacian_pyramid(gaussian_pyramid, levels):    # Levels = 5
 
-    image_pyramid = [gaussian_pyramid[levels - 1]]
+    image_pyramid = [gaussian_pyramid[levels - 1]]          # L4 from gaussian_pyramid
 
-    for i in range(levels - 1, 0, -1):
+    for i in range(levels - 1, 0, -1):          # Iteration: i = 4, i = 3, i = 2, i = 1
         # Upscale the images manually
         upscaled_img = cv2.resize(gaussian_pyramid[i], (gaussian_pyramid[i-1].shape[1], gaussian_pyramid[i-1].shape[0]))
 

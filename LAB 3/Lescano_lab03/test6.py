@@ -1,29 +1,37 @@
 import cv2
 import numpy as np
 
+from Lescano_lab03_blending import *
 
-# Step-2
+# Step-2    SAME WITH ORIGINAL
 # Find the Gaussian pyramid of the two images and the mask
 def gaussian_pyramid(img, num_levels):
-    lower = img.copy()
-    gaussian_pyr = [lower]
+
+    gaussian_pyr = [img]          # index 0 is the copy of the original image
+
     for i in range(num_levels):
-        lower = cv2.pyrDown(lower)
-        gaussian_pyr.append(np.float32(lower))
+        img = gaussian_blur(gaussian_pyr[-1], GAUSSIAN_KERNEL_SIZE)
+        img = cv2.resize(img, (img.shape[1] // 2, img.shape[0] // 2))
+        gaussian_pyr.append(img)
+
     return gaussian_pyr
 
 # Step-3
 # Then calculate the Laplacian pyramid
 def laplacian_pyramid(gaussian_pyr):
-    laplacian_top = gaussian_pyr[-1]
-    num_levels = len(gaussian_pyr) - 1
+
+    laplacian_top = gaussian_pyr[-1]        # the last image in the gaussian_pyr, the blurriest one
+
+    num_levels = len(gaussian_pyr) - 1      # num_levels = 6, so now it's 5
     
-    laplacian_pyr = [laplacian_top]
-    for i in range(num_levels,0,-1):
+    laplacian_pyr = [laplacian_top]         # use 2nd to the last image
+
+    for i in range(num_levels, 0, -1):      #
         size = (gaussian_pyr[i - 1].shape[1], gaussian_pyr[i - 1].shape[0])
-        gaussian_expanded = cv2.pyrUp(gaussian_pyr[i], dstsize=size)
-        laplacian = np.subtract(gaussian_pyr[i-1], gaussian_expanded)
+        gaussian_expanded = cv2.resize(gaussian_pyr[i], size)
+        laplacian = cv2.subtract(gaussian_pyr[i - 1], gaussian_expanded)
         laplacian_pyr.append(laplacian)
+        
     return laplacian_pyr
 
 # Step-4
@@ -43,10 +51,11 @@ def reconstruct(laplacian_pyr):
     num_levels = len(laplacian_pyr) - 1
     for i in range(num_levels):
         size = (laplacian_pyr[i + 1].shape[1], laplacian_pyr[i + 1].shape[0])
-        laplacian_expanded = cv2.pyrUp(laplacian_top, dstsize=size)
-        laplacian_top = cv2.add(laplacian_pyr[i+1], laplacian_expanded)
+        laplacian_expanded = cv2.resize(laplacian_top, size)
+        laplacian_top = cv2.add(laplacian_expanded, laplacian_pyr[i + 1])
         laplacian_lst.append(laplacian_top)
     return laplacian_lst
+
 
 # Now let's call all these functions
 if __name__ == '__main__':
@@ -61,15 +70,32 @@ if __name__ == '__main__':
     mask = np.zeros((1000,1800,3), dtype='float32')
     mask[250:500,640:1440,:] = (1,1,1)
     
-    num_levels = 7
+    num_levels = 6
     
+
+
     # For image-1, calculate Gaussian and Laplacian
     gaussian_pyr_1 = gaussian_pyramid(img1, num_levels)
     laplacian_pyr_1 = laplacian_pyramid(gaussian_pyr_1)
 
+    # Visualize
+    # visualize_pyramid(gaussian_pyr_1, 'Gaussian One')
+    # visualize_pyramid(laplacian_pyr_1, 'Laplacian One')
+
+
+
+
     # For image-2, calculate Gaussian and Laplacian
     gaussian_pyr_2 = gaussian_pyramid(img2, num_levels)
     laplacian_pyr_2 = laplacian_pyramid(gaussian_pyr_2)
+
+    # Visualize
+    # visualize_pyramid(gaussian_pyr_2, 'Gaussian Two')
+    # visualize_pyramid(laplacian_pyr_2, 'Laplacian Two')
+
+
+
+
 
     # Calculate the Gaussian pyramid for the mask image and reverse it.
     mask_pyr_final = gaussian_pyramid(mask, num_levels)
@@ -82,4 +108,4 @@ if __name__ == '__main__':
     final  = reconstruct(add_laplace)
 
     # Save the final image to the disk
-    cv2.imwrite('output/crazyblend.png', final[num_levels])
+    cv2.imwrite('output/crazyblend_test_3.png', final[num_levels])
