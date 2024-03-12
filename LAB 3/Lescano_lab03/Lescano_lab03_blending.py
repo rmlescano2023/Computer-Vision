@@ -4,8 +4,8 @@ import cv2
 import numpy as np
 
 # --------------------------------------------------------------------------------------------------------------- GLOBAL VARIABLES
-PYRAMID_LEVELS = 5                # Number of levels in the Gaussian and Laplacian pyramids
-GAUSSIAN_KERNEL_SIZE = 5        # Size of the Gaussian kernel
+PYRAMID_LEVELS = 5                  # Number of levels in the Gaussian and Laplacian pyramids
+GAUSSIAN_KERNEL_SIZE = 5            # Size of the Gaussian kernel
 
 
 # --------------------------------------------------------------------------------------------------------------- GAUSSIAN PYRAMID
@@ -36,6 +36,29 @@ def generate_laplacian_pyramid(gaussian_pyramid, levels):    # Levels = 5
 
     return image_pyramid
 
+"""""
+cv2.resize(src, (desired width, desired height)) = cv2.resize(L4, (L3 width, L3 height)) => upscaled
+ang result kay upscaled image sang L4, same size na sa L3
+
+L = Level
+
+gaussian_pyramid = [    L0 = original image,
+                        L1,
+                        L2,
+                        L3,
+                        L4,
+                        L5 = blurriest image
+]
+
+
+image_pyramid = [       L4,
+                        i = 4; result = L3 - L4; L3 = L3 - L4
+                        i = 3; result = L2 - L3; L2 = L2 - L3
+                        i = 2; result = L1 - L2; L1 = L1 - L2
+                        i = 1; result = L0 - L1; L0 = L0 - L1
+]
+
+"""""
 
 # --------------------------------------------------------------------------------------------------------------- BLENDING
 def concat_images(pyramid_1, pyramid_2):       # pyramid_1 is apple, pyramid_2 is orange
@@ -62,7 +85,7 @@ def blend_images(concat_result, levels):
         upscaled_blend = cv2.resize(blended_image, (concat_result[i].shape[1], concat_result[i].shape[0]))
         
         # Add the upscaled blended image and the Laplacian image at the current level
-        blended_image = upscaled_blend + concat_result[i]
+        blended_image = cv2.add(upscaled_blend, concat_result[i])
 
     return blended_image
 
