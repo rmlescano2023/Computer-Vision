@@ -1,7 +1,7 @@
-# In this code, I will resort to using pyramids instead of stacks
-
 import cv2
 import numpy as np
+
+# from Lescano_lab03_blending import *
 
 # --------------------------------------------------------------------------------------------------------------- GLOBAL VARIABLES
 PYRAMID_LEVELS = 6                  # Number of levels in the Gaussian and Laplacian pyramids
@@ -9,56 +9,31 @@ GAUSSIAN_KERNEL_SIZE = 7            # Size of the Gaussian kernel
 
 
 # --------------------------------------------------------------------------------------------------------------- GAUSSIAN PYRAMID
-def generate_gaussian_pyramid(image, levels, kernel_size):
+def gaussian_pyramid(img, num_levels):
 
-    image_pyramid = [image]       # Original image is at index 0
+    lower = img.copy()
 
-    for i in range(levels):
-        blurred_image = gaussian_blur(image_pyramid[-1], kernel_size)
-        blurred_image = cv2.resize(blurred_image, (blurred_image.shape[1] // 2, blurred_image.shape[0] // 2))
-        image_pyramid.append(blurred_image)
+    gaussian_pyr = [lower]          # index 0 is the copy of the original image
 
-    return image_pyramid
+    for i in range(num_levels):
+        img = cv2.resize(img, (img.shape[1] // 2, img.shape[0] // 2))
+        gaussian_pyr.append(img)
+
+    return gaussian_pyr
 
 
 # --------------------------------------------------------------------------------------------------------------- LAPLACIAN PYRAMID
-def generate_laplacian_pyramid(gaussian_pyramid, levels):    # Levels = 5
-
-    image_pyramid = [gaussian_pyramid[levels - 1]]
-
-    for i in range(levels - 1, 0, -1):
-        # Upscale the images manually
-        upscaled_img = cv2.resize(gaussian_pyramid[i], (gaussian_pyramid[i-1].shape[1], gaussian_pyramid[i-1].shape[0]))
-
-        # Construct Laplacian images
-        result = cv2.subtract(gaussian_pyramid[i - 1], upscaled_img)
-        image_pyramid.append(result)
-
-    return image_pyramid
-
-"""""
-cv2.resize(src, (desired width, desired height)) = cv2.resize(L4, (L3 width, L3 height)) => upscaled
-ang result kay upscaled image sang L4, same size na sa L3
-
-L = Level
-
-gaussian_pyramid = [    L0 = original image,
-                        L1,
-                        L2,
-                        L3,
-                        L4,
-                        L5 = blurriest image
-]
-
-
-image_pyramid = [       L4,
-                        i = 4; result = L3 - L4; L3 = L3 - L4
-                        i = 3; result = L2 - L3; L2 = L2 - L3
-                        i = 2; result = L1 - L2; L1 = L1 - L2
-                        i = 1; result = L0 - L1; L0 = L0 - L1
-]
-
-"""""
+def laplacian_pyramid(gaussian_pyr):
+    laplacian_top = gaussian_pyr[-1]
+    num_levels = len(gaussian_pyr) - 1
+    
+    laplacian_pyr = [laplacian_top]
+    for i in range(num_levels, 0, -1):
+        size = (gaussian_pyr[i - 1].shape[1], gaussian_pyr[i - 1].shape[0])
+        gaussian_expanded = cv2.resize(gaussian_pyr[i], size)
+        laplacian = cv2.subtract(gaussian_pyr[i - 1], gaussian_expanded)
+        laplacian_pyr.append(laplacian)
+    return laplacian_pyr
 
 # --------------------------------------------------------------------------------------------------------------- BLENDING
 def concat_images(pyramid_1, pyramid_2):       # pyramid_1 is apple, pyramid_2 is orange
@@ -75,6 +50,7 @@ def concat_images(pyramid_1, pyramid_2):       # pyramid_1 is apple, pyramid_2 i
     
     return concatenated_images
 
+
 def blend_images(concat_result, levels):
 
     blended_image = concat_result[0]
@@ -90,11 +66,27 @@ def blend_images(concat_result, levels):
     return blended_image
 
 
+def blend_crazy_images(laplacian_A, laplacian_B, mask_pyr):
+    LS = []
+    for la,lb,mask in zip(laplacian_A,laplacian_B,mask_pyr):
+        ls = lb * mask + la * (1.0 - mask)
+        LS.append(ls)
+    return LS
+
+
+def reconstruct_crazy_images(laplacian_pyr):
+    laplacian_top = laplacian_pyr[0]
+    laplacian_lst = [laplacian_top]
+    num_levels = len(laplacian_pyr) - 1
+    for i in range(num_levels):
+        size = (laplacian_pyr[i + 1].shape[1], laplacian_pyr[i + 1].shape[0])
+        laplacian_expanded = cv2.resize(laplacian_top, size)
+        laplacian_top = cv2.add(laplacian_expanded, laplacian_pyr[i + 1])
+        laplacian_lst.append(laplacian_top)
+    return laplacian_lst
+
+
 # --------------------------------------------------------------------------------------------------------------- HELPER FUNCTIONS
-def gaussian_blur(image, kernel_size):
-
-    return cv2.GaussianBlur(image, (kernel_size, kernel_size), 0)
-
 def preview_images(image_1, image_2):
 
     value = image_1.shape[1]
@@ -150,7 +142,6 @@ def show_blended_image(blended_image):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-
 # --------------------------------------------------------------------------------------------------------------- MAIN
 def blend_apple_orange(levels, kernel_size):
 
@@ -162,12 +153,12 @@ def blend_apple_orange(levels, kernel_size):
     preview_images(image_1, image_2)
 
     # Generate Gaussian pyramid of the two images
-    img1_gaussian_pyramid = generate_gaussian_pyramid(image_1, levels, kernel_size)         # apple
-    img2_gaussian_pyramid = generate_gaussian_pyramid(image_2, levels, kernel_size)         # orange
+    img1_gaussian_pyramid = gaussian_pyramid(image_1, levels)         # apple
+    img2_gaussian_pyramid = gaussian_pyramid(image_2, levels)         # orange
 
     # Generate Laplacian pyramid of the two images
-    img1_laplacian_pyramid = generate_laplacian_pyramid(img1_gaussian_pyramid, levels)      # apple
-    img2_laplacian_pyramid = generate_laplacian_pyramid(img2_gaussian_pyramid, levels)      # orange
+    img1_laplacian_pyramid = laplacian_pyramid(img1_gaussian_pyramid)      # apple
+    img2_laplacian_pyramid = laplacian_pyramid(img2_gaussian_pyramid)      # orange
 
     # Concatenating the half images
     concat_result = concat_images(img1_laplacian_pyramid, img2_laplacian_pyramid)
@@ -180,36 +171,51 @@ def blend_apple_orange(levels, kernel_size):
     cv2.imwrite('output/test.png', blended_image)
     show_blended_image(blended_image)
 
-def blend_crazy(levels, kernel_size):
+def blend_crazy():
 
-    # Load the images
-    image_1 = cv2.imread('examples/Lescano_lab03_crazyone.png')
-    image_2 = cv2.imread('examples/Lescano_lab03_crazytwo.png')
+    # Load the two images
+    img1 = cv2.imread('examples/sky.png')
+    img1 = cv2.resize(img1, (1800, 1000))
+    img2 = cv2.imread('examples/plane.jpg')
+    img2 = cv2.resize(img2, (1800, 1000))
 
     # Create the mask
     mask = np.zeros((1000,1800,3), dtype='float32')
     mask[250:500,640:1440,:] = (1,1,1)
-
-    # Generate Gaussian pyramid of all the images
-    img1_gaussian_pyramid = generate_gaussian_pyramid(image_1, levels, kernel_size)
-    img2_gaussian_pyramid = generate_gaussian_pyramid(image_2, levels, kernel_size)
-    mask_gaussian_pyramid = generate_gaussian_pyramid(mask, levels, kernel_size)
-
-    # Try using my program
-    gaussian_pyr_1 = generate_gaussian_pyramid(image_1, levels, kernel_size)
-    laplacian_pyr_1 = generate_laplacian_pyramid(gaussian_pyr_1, levels)
+    
+    num_levels = 7
+    
+    # For image-1, calculate Gaussian and Laplacian
+    gaussian_pyr_1 = gaussian_pyramid(img1, num_levels)
+    laplacian_pyr_1 = laplacian_pyramid(gaussian_pyr_1)
 
     # Visualize
     # visualize_pyramid(gaussian_pyr_1, 'Gaussian One')
     # visualize_pyramid(laplacian_pyr_1, 'Laplacian One')
 
+    # For image-2, calculate Gaussian and Laplacian
+    gaussian_pyr_2 = gaussian_pyramid(img2, num_levels)
+    laplacian_pyr_2 = laplacian_pyramid(gaussian_pyr_2)
+
     # Try using my program
-    gaussian_pyr_2 = generate_gaussian_pyramid(image_2, levels, kernel_size)
-    laplacian_pyr_2 = generate_laplacian_pyramid(gaussian_pyr_2, levels)
+    # gaussian_pyr_2 = generate_gaussian_pyramid(img2, num_levels, 5)
+    # laplacian_pyr_2 = generate_laplacian_pyramid(gaussian_pyr_2, num_levels)
 
     # Visualize
-    visualize_pyramid(gaussian_pyr_2, 'Gaussian Two')
-    visualize_pyramid(laplacian_pyr_2, 'Laplacian Two')
+    # visualize_pyramid(laplacian_pyr_2, 'Laplacian Two')
+
+    # Calculate the Gaussian pyramid for the mask image and reverse it.
+    mask_pyr_final = gaussian_pyramid(mask, num_levels)
+    mask_pyr_final.reverse()
+
+    # Blend the images
+    add_laplace = blend_crazy_images(laplacian_pyr_1,laplacian_pyr_2,mask_pyr_final)
+
+    # Reconstruct the images
+    final = reconstruct_crazy_images(add_laplace)
+
+    # Save the final image to the disk
+    cv2.imwrite('output/crazyblend_test_4.png', final[num_levels])
 
 
 def main():
@@ -222,7 +228,8 @@ def main():
     blend_apple_orange(levels, kernel_size)
 
     # Blend two images using an irregular mask
-    # blend_crazy(levels, kernel_size)
+    blend_crazy()
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     main()
