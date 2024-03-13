@@ -76,3 +76,56 @@ You will implement Gaussian and Laplacian stacks, which are kind of like pyramid
 Implement a Gaussian and a Laplacian stack. The difference between a stack and a pyramid is that in each level of the pyramid the image is downsampled, so that the result gets smaller and smaller. In a stack, the images are never downsampled so the results are all the same dimension as the original image, and can all be saved in one 3D matrix (if the original image was a grayscale image). To create the successive levels of the Gaussian stack, just apply the Gaussian filter at each level, but do not subsample. In this way we will get a stack that behaves similarly to a pyramid that was downsampled to half its size at each level. If you would rather work with pyramids, you may implement pyramids other than stacks. However, in any case, you are NOT allowed to use existing pyramid (pyrDown, pyrUp) functions. You must implement your stacks from scratch.
 1. Apply your Gaussian and Laplacian stacks to your input pair of images to recreate the outcomes similar to Figure 3.42 in Szelski (2nd ed).
 2. Using another pair of images, blend them together using some crazy ideas of your own. See Figure 8 of the 1983 paper by Burt and Adelson for some inspiration. You should always use an irregular mask and also, create a Gaussian stack for your mask image as well as for the two input images. The Gaussian blurring of the mask in the pyramid will smooth out the transition between the two images.
+
+<br>
+
+## LAB 4
+
+The goal of this laboratory exercise is to estimate the amount of liquid contained in a bottle.
+
+The accompanying directories (https://drive.google.com/drive/folders/1rLQPUpJejYdw77dnDq5RdISKF-ndL0lY?usp=sharing)
+contain the images of the bottle with a specified amount of contained liquid.
+
+Thus, the directory 50mL contains pictures of the bottle with 50 mL liquid in it. And so on...
+The directory 'guess' contains images of the bottle with unknown amounts of liquid. You are to guess these amounts.
+
+OpenCV image filtering, thresholding, or morphology operations are allowed.
+
+Hints:
+Count the number of pixels corresponding to the liquid and have it mapped to the labelled amount.
+OR
+Compute the area (or some other measure) of the region occupied by the liquid in the image and have it mapped to the labelled amount.
+
+
+Use interpolation or regression to guess the unknown amounts.
+
+
+
+<br>
+
+## LAB 5
+
+### Image Stitching
+(individual or groups of two)
+
+1. Read https://medium.com/@paulsonpremsingh7/image-stitching-using-opencv-a-step-by-step-tutorial-9214aa4255ec
+
+2. Using the code in #1 as basis, stitch the images in the directory named 'data'.
+
+3. Using the video named 'spike.mp4' in directory 'data', generate an actionshot image. 
+
+Actionshot is a method of capturing an object in action and displaying it in a single image with multiple sequential appearances of the object.
+Extra credits for using your own video for the actionshot image.
+(doing the cartwheel, running forehand in tennis, grand jeté in ballet, somersault in acrobatics or diving, forward flip in skateboarding)
+SAFETY FIRST. Be sure you know what you are doing should you embark in this adventure.
+
+
+
+<br>
+
+## LAB 6
+
+### Do-it-yourself (DIY) Pinhole Camera
+(individual or groups of two or three)
+
+Create a classroom model pinhole camera.
