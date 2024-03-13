@@ -1,3 +1,16 @@
+""" 
+    File: Computer Vision Laboratory 03
+    Author: Renmar M. Lescano
+    Date Modified: 03/13/2024
+
+    Description:        
+        This Python script demonstrates how to blend images using Gaussian and Laplacian pyramids. It offers two
+        options: blending images vertically and blending them with a custom mask. The vertical blending method involves
+        splitting images into pyramids and combining their left halves. On the other hand, blending with a custom mask
+        involves creating a mask to blend images selectively. These techniques showcase effective ways to seamlessly
+        blend images for various purposes.
+"""
+
 import cv2
 import numpy as np
 
