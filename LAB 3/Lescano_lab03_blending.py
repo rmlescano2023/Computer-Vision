@@ -1,7 +1,7 @@
 """ 
     File: Computer Vision Laboratory 03
     Author: Renmar M. Lescano
-    Date Modified: 03/13/2024
+    Date Modified: 03/19/2024
 
     Description:        
         This Python script demonstrates how to blend images using Gaussian and Laplacian pyramids. It offers two
@@ -26,7 +26,7 @@ def generate_gaussian_pyramid(img, levels):
     gaussian_pyr = [lower]          # index 0 is the copy of the original image
 
     for i in range(levels):
-        img = cv2.resize(img, (img.shape[1] // 2, img.shape[0] // 2))
+        img = cv2.resize(img, (img.shape[1] // 2, img.shape[0] // 2))       
         gaussian_pyr.append(img)
 
     return gaussian_pyr
@@ -40,8 +40,8 @@ def generate_laplacian_pyramid(gaussian_pyr):
     levels = len(gaussian_pyr) - 1
 
     for i in range(levels, 0, -1):
-        gaussian_expanded = cv2.resize(gaussian_pyr[i], (gaussian_pyr[i - 1].shape[1], gaussian_pyr[i - 1].shape[0]))
-        laplacian = cv2.subtract(gaussian_pyr[i - 1], gaussian_expanded)
+        gaussian_upscaled = cv2.resize(gaussian_pyr[i], (gaussian_pyr[i - 1].shape[1], gaussian_pyr[i - 1].shape[0]))
+        laplacian = cv2.subtract(gaussian_pyr[i - 1], gaussian_upscaled)
 
         laplacian_pyr.append(laplacian)
 
@@ -54,7 +54,7 @@ def concat_images(pyramid_1, pyramid_2):
 
     for left_img, right_img in zip(pyramid_1, pyramid_2):
         columns = left_img.shape[1]
-        result = np.hstack((left_img[ : , 0 : columns//2], right_img[ : , columns//2 : ]))
+        result = np.hstack((left_img[ : , 0 : columns//2], right_img[ : , columns//2 : ]))      # hstack horizontally stacks two images together
 
         concatenated_images.append(result)
     
@@ -67,6 +67,7 @@ def blend_images(concat_result, levels):
 
     # Iterate over the Laplacian images and add them to the blended image
     for i in range(1, levels):
+
         # Upscale the blended image manually to match the size of the Laplacian image
         upscaled_blend = cv2.resize(blended_image, (concat_result[i].shape[1], concat_result[i].shape[0]))
         
