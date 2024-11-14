@@ -4,6 +4,11 @@
 
 <br>
 
+## Exersion
+**Exersion** is a real-time pose detection application that leverages computer vision and machine learning to detect and visualize human body poses using a webcam feed. The application utilizes **MediaPipe**, a framework developed by Google, for efficient pose detection, and integrates with **OpenCV** for image processing and visualization. The core functionality includes detecting key body landmarks such as the shoulders, elbows, hips, and knees, and drawing them onto the captured image in real-time. The pose detection excludes face landmarks, focusing solely on the human body for tracking physical posture and movements. Users can visualize these body landmarks on their webcam feed, making it ideal for fitness, posture correction, or motion analysis applications. The system is built to handle dynamic input, displaying detected poses in a live video stream. The application also supports handling error messages if no body is detected in the camera feed, ensuring a seamless user experience.
+
+<br>
+
 ## LAB 1
 
 In this laboratory exercise, you are given a square image. Then, create a program that replicates the process as shown in this video: https://fb.watch/pWLNqOIQPE/
